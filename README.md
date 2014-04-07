@@ -2,3 +2,156 @@ MTLogger
 ========
 
 Simple logger module for Node.js, using JSON and text file storage.
+
+
+Basic usage example:
+```js
+MTLogger  = require('./MTLogger.js');
+myLogger = new MTLogger("./my_log_file.log");
+myLogger.info("Hello, world!");
+```
+
+There are 6 log levels and relative logging functions: `silly`, `debug`, `verbose`, `info`, `warn`, `error`.
+
+You can read the log with 4 query functions: `newest`, `oldest`, `newerThen`, `all`.
+
+
+
+Progressive 10-points tutorial:
+-------------------------------
+```js
+//0. Import the module
+MTLogger = require ('./MTLogger.js');
+
+//1. Initialize your logger object
+var myLogger = new MTLogger("./my_log_file.log");
+
+//2. Log something, like a very annoying message
+myLogger.silly("Hi there, I am very glad to publish "
+             + "my first repository on GitHub :) ");
+
+//3. Or log an important error message
+myLogger.error("Help, no more chocolate!");
+
+//4. Eventualy make a query to get the last log entry
+myLogger.newest();
+//that will return the following object
+//without reading the log file:
+//{ timestamp: 1396826581187,
+//  level: 'error',
+//  message: 'Help, no more chocolate!',
+//  id: 1 }
+
+//5. Get an array of all the log entries from 2 hours ago
+myLogger.newerThen({timestamp: Date.now() - 1000*60*60*2});
+
+
+//6. Initialize a second concurrent logger
+var myExceptionLogger = new MTLogger("./my_nodejs_brutal_exits.log", 1);
+//Why not? But with a history limit of 1 log entry
+
+//7. And use it to log uncaught exceptions
+process.on('uncaughtException', function(e) {
+  myExceptionLogger.error(e.toString());
+  process.exit();
+});
+//Now, if you make any mistake outside try/catchs,
+// the error messages will be logged to file (instead of
+// written to the console) before letting node.js crash.
+
+
+setTimeout(function(){
+
+  //8. Why did my script crashed?
+  var lastCrashLog = myExceptionLogger.newest();
+  //Obviously, the initialization of the logger (point 5)
+  // implies an asyncronous read of the log file.
+  // So, the messages logged during the previous
+  // sessions are loaded in memory and you can
+  // query them like above. In this case you will
+  // not get more than ONE message because of
+  // the history limit. Also note that if you
+  // are too fast, you will get nothing because
+  // you have to let it finish the initialization
+  // by waiting some milliseconds and that's a 
+  // KNOWN ISSUE!   (event emitters will help)
+  
+  //9. Report crash message with date and time, only once
+  if(lastCrashLog.level == 'error'){
+    console.log("Crash reported: " + new Date(lastCrashLog.timestamp));
+    console.log("  reason: " + lastCrashLog.message);
+    myExceptionLogger.info("Crash reported");
+  }
+  
+}, 50);
+```
+
+
+Brief reference
+---------------
+
+###MTLogger constructor
+`MTLogger(log_file_path, [log_history_limit], [log_load_byte_limit])`
+
+It returns an MTLogger object.
+
+The first optional numeric parameter **limits the number of log entries kept in memory**. It will not limit the log file size.
+
+The secondo optional numeric parameter lets you load the newest log entries by **reading only the tail of the log file**.
+
+
+###Logging functions
+
+`silly(message)`
+`debug(message)`
+`verbose(message)`
+`info(message)`
+`warn(message)`
+`error(message)`
+
+They push a message in the log (on the memory and at the end of the log file).
+
+The only parameter must be the string that you want to log.
+
+Example: `yourLogger.debug('test');`
+
+
+###Query functions
+
+#####`all()`
+Returns an array containing all the log entries.
+
+#####`newest([older])`
+Returns the last log entry. Specifying a numeric parameter, you can go back getting the n-th to last entry kept in memory.
+Example:
+```js
+myLogger.debug('0'); myLogger.debug('1'); myLogger.debug('2'); myLogger.debug('3');
+myLogger.newest(0).message //returns '3'
+myLogger.newest(1).message //returns '2
+```
+#####`oldest([newer])`
+Returns the oldest log entry kept in memory (see the first parameter of the costructor). Specifying a numeric parameter, you can go forward getting the n-th entry.
+Example:
+```js
+myLogger.debug('0'); myLogger.debug('1'); myLogger.debug('2'); myLogger.debug('3');
+myLogger.newest(0).message //returns '3'
+myLogger.newest(1).message //returns '2
+```
+
+#####`newerThen(older)`
+Returns an array containing all the log entries after that specified as parameter (excluded). The parameter may be a log entry or an object with the proprieties `timestamp` and `id:-1`.
+
+
+TO-DO-list:
+-----------
+* get log count
+* get/set history limit
+* allow the use of an object as parameter of the constructor.
+* allow the definition of a custom array of log levels
+* generic query function filtering log by level too
+* make logging functions async, that wait for writeability, so I can do the following:
+* make the file loading function block the logging functions
+* queue the log entries before appending to file, and do it in an event, maybe, so I can do the following:
+* add/remove log files, with filters.
+* watch file(s) for logs from other processes and allow this function to be disabled.
+* Maybe I'm making this tooooo much complex to call it as a "simple logger"?

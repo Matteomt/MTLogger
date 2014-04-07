@@ -1,8 +1,7 @@
 MTLogger
 ========
 
-Simple logger module for Node.js, using JSON and text file storage.
-
+A node.js module for logging using JSON and text file storage.
 
 Basic usage example:
 ```js
@@ -11,10 +10,13 @@ myLogger = new MTLogger("./my_log_file.log");
 myLogger.info("Hello, world!");
 ```
 
-There are 6 log levels and relative logging functions: `silly`, `debug`, `verbose`, `info`, `warn`, `error`.
+MTLogger is one of the infinite ways to:
+* log text messages, using 6 log levels and relative logging functions: `silly`, `debug`, `verbose`, `info`, `warn`, `error`;
+* read the log with 4 query functions: `newest`, `oldest`, `newerThen`, `all`;
+* keep the log in sync with a text file.
 
-You can read the log with 4 query functions: `newest`, `oldest`, `newerThen`, `all`.
 
+.
 
 
 Progressive 10-points tutorial:

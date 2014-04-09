@@ -28,14 +28,14 @@ MTLogger = require ('./MTLogger.js');
 
 //1. Initialize your logger object (there are different ways)
 var myLogger = MTLogger.setup({
-  file: "./my_log_file.log",
-  load_limit: 200000
+  file: "./my_log_file.log",
+  load_limit: 200000
 });
 //it will load the last 200000 bytes of the specified text file.
 
 //2. Log something, like a very annoying message
 myLogger.silly("Hi there, I am very glad to publish "
-             + "my first repository on GitHub :) ");
+             + "my first repository on GitHub :) ");
 
 //3. Or log an important error message
 myLogger.error("Help, no more chocolate!");

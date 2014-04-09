@@ -1,0 +1,31 @@
+{
+  "name": "MTLogger",
+  "version": "0.1.4",
+  "author": {
+    "name": "Matteomt"
+  },
+  "description": "",
+  "main": "./MTLogger.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Matteomt/MTLogger.git"
+  },
+  "keywords": [
+    "log",
+    "logger",
+    "JSON"
+  ],
+  "license": "GPL",
+  "engines": {
+    "node": ">=0.10"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "readme": "see README.md",
+  "readmeFilename": "README.md",
+  "bugs": {
+    "url": "https://github.com/Matteomt/MTLogger/issues"
+  },
+  "homepage": "https://github.com/Matteomt/MTLogger"
+}
